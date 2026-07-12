@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-neutral-bg text-neutral-darkest font-sans antialiased;
+  }
+}
+
+/* Customização sutil de foco baseada no Style Guide */
+input:focus, select:focus {
+  @apply border-brand-primary ring-1 ring-brand-primary outline-none transition-all;
+}
