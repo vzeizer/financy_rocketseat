@@ -22,7 +22,7 @@ server.listen({ port: PORT }).then(({ url }) => {
   console.log(`🚀 Financy API rodando em: ${url}`);
 });
 
-/*
+/* Pode ser que haja necessidade uma adaptação aqui, conforme abaixo:
 
 // No seu src/server.ts altere a assinatura para:
 import { schema } from './graphql/schema';
