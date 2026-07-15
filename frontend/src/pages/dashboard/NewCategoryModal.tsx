@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { useMutation, gql } from '@apollo/client';
+import { IconMapper } from '../../lib/icon-mapper';
 
 const categorySchema = zod.object({
   name: zod.string().min(1, 'O título da categoria é obrigatório.'),
@@ -26,8 +27,8 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
     onClose();
   };
 
-  // Amostra de ícones extraída diretamente do seu arquivo icones.txt
-  const iconOptions = ['utensils.svg', 'car-front.svg', 'shopping-cart.svg', 'heart-pulse.svg', 'briefcase-business.svg', 'dumbbell.svg'];
+  // Amostra de ícones usando IconMapper
+  const iconOptions = ['utensils', 'car-front', 'shopping-cart', 'heart-pulse', 'briefcase-business', 'dumbbell'];
   const colorOptions = ['#2563EB', '#7C3AED', '#DB2777', '#EA580C', '#CA8A04', '#168054'];
 
   return (
@@ -52,7 +53,7 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
             {errors.name && <span className="text-xs text-feedback-error">{errors.name.message as string}</span>}
           </div>
 
-          {/* Grid Seletor de Ícones do arquivo txt */}
+          {/* Grid Seletor de Ícones usando IconMapper */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-neutral-dark uppercase tracking-wider">Ícone representativo</label>
             <div className="grid grid-cols-6 gap-2">
@@ -62,8 +63,7 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
                   type="button" 
                   className="p-2.5 border border-neutral-light hover:border-brand-primary rounded-xl flex items-center justify-center text-neutral-dark transition-all bg-white"
                 >
-                  <img src={`/icons/${icon}`} alt="" className="w-5 h-5 opacity-70" onError={(e)=>{e.currentTarget.style.display='none'}} />
-                  <span className="text-[10px] truncate max-w-full">{icon.replace('.svg','')}</span>
+                  <IconMapper name={`${icon}.svg`} size={20} />
                 </button>
               ))}
             </div>

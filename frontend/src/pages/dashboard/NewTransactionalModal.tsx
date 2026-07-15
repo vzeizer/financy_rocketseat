@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { useMutation, gql } from '@apollo/client';
 
-const transactionSchema = zod.create({
+const transactionSchema = zod.object({
   title: zod.string().min(1, 'A descrição é obrigatória.'),
   amount: zod.number().positive('Insira um valor válido.'),
   type: zod.enum(['INCOME', 'EXPENSE']),
