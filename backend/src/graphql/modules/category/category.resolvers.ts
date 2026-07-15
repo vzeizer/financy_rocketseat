@@ -1,5 +1,5 @@
 import { CategoryService } from '../../../services/category.service';
-import { requireAuth } from '../../context';
+import { requireAuth } from '../context';
 export const categoryResolvers = {
   Query: {
     categories: (_: any, __: any, ctx: any) => {

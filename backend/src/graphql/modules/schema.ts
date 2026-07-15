@@ -1,24 +1,32 @@
-import { TransactionService } from '../../../services/transaction.service';
-import { requireAuth } from '../../context';
-export const transactionResolvers = {
-  Query: {
-    transactions: (_: any, __: any, ctx: any) => {
-      requireAuth(ctx.userId);
-      return TransactionService.listAll(ctx.userId);
-    },
-  },
-  Mutation: {
-    createTransaction: (_: any, args: any, ctx: any) => {
-      requireAuth(ctx.userId);
-      return TransactionService.create(args, ctx.userId);
-    },
-    updateTransaction: (_: any, { id, ...data }: any, ctx: any) => {
-      requireAuth(ctx.userId);
-      return TransactionService.update(id, data, ctx.userId);
-    },
-    deleteTransaction: (_: any, { id }: any, ctx: any) => {
-      requireAuth(ctx.userId);
-      return TransactionService.delete(id, ctx.userId);
-    },
-  },
+import { gql } from 'apollo-server';
+import { authTypeDefs } from './auth/auth.typeDefs';
+import { categoryTypeDefs } from './category/category.typeDefs';
+import { transactionTypeDefs } from './transaction/transaction.typeDefs';
+import { authResolvers } from './auth/auth.resolvers';
+import { categoryResolvers } from './category/category.resolvers';
+import { transactionResolvers } from './transaction/transaction.resolvers';
+
+// TypeDefs base que declaram os tipos Query e Mutation vazios para extensão
+const baseTypeDefs = gql`
+  type Query {
+    _empty: String
+  }
+  type Mutation {
+    _empty: String
+  }
+`;
+
+// Combina todos os typeDefs modulares
+export const typeDefs = [
+  baseTypeDefs,
+  authTypeDefs,
+  categoryTypeDefs,
+  transactionTypeDefs,
+];
+
+// Combina todos os resolvers modulares
+export const resolvers = {
+  ...authResolvers,
+  ...categoryResolvers,
+  ...transactionResolvers,
 };

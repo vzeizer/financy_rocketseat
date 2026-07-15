@@ -8,7 +8,7 @@ export class TransactionService {
     });
   }
 
-  static async create(data: { title: string; amount: float; type: string; categoryId: string }, userId: string) {
+  static async create(data: { title: string; amount: number; type: string; categoryId: string }, userId: string) {
     const category = await prisma.category.findFirst({ where: { id: data.categoryId, userId } });
     if (!category) throw new Error('Categoria inválida.');
 

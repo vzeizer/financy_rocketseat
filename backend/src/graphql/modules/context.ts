@@ -1,11 +1,19 @@
-import { ExpressContext } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 
 export interface GraphQLContext {
   userId?: string;
 }
 
-export const createContext = ({ req }: ExpressContext): GraphQLContext => {
+// Tipagem genérica compatível com o req do Apollo Server
+interface ContextParams {
+  req: {
+    headers: {
+      authorization?: string;
+    };
+  };
+}
+
+export const createContext = ({ req }: ContextParams): GraphQLContext => {
   const authHeader = req.headers.authorization || '';
   
   if (authHeader.startsWith('Bearer ')) {

@@ -1,5 +1,7 @@
 import { TransactionService } from '../../../services/transaction.service';
-import { requireAuth } from '../../context';
+import { requireAuth } from '../context';
+import { prisma } from '../../../lib/prisma';
+
 export const transactionResolvers = {
   Query: {
     transactions: (_: any, __: any, ctx: any) => {
@@ -19,6 +21,12 @@ export const transactionResolvers = {
     deleteTransaction: (_: any, { id }: any, ctx: any) => {
       requireAuth(ctx.userId);
       return TransactionService.delete(id, ctx.userId);
+    },
+  },
+  Transaction: {
+    category: (parent: any) => {
+      if (parent.category) return parent.category;
+      return prisma.category.findUnique({ where: { id: parent.categoryId } });
     },
   },
 };
