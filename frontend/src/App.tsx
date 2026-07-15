@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { Login } from './pages/auth/Login';
-import { Dashboard } from './pages/dashboard/Dashboard';
+import { Register } from './pages/auth/Register';
+import { Dashboard } from './pages/dashboard/Dashboards';
 import { Transactions } from './pages/dashboard/Transactions';
 import { Categories } from './pages/dashboard/Categories';
 import { IconMapper } from './lib/icon-mapper';
@@ -9,8 +10,15 @@ import { IconMapper } from './lib/icon-mapper';
 export default function App() {
   const { signed, user, logout } = useAuth();
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'transactions' | 'categories'>('dashboard');
+  const [showRegister, setShowRegister] = useState(false);
 
-  if (!signed) return <Login />;
+  if (!signed) {
+    return showRegister ? (
+      <Register onSwitchToLogin={() => setShowRegister(false)} />
+    ) : (
+      <Login onSwitchToRegister={() => setShowRegister(true)} />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
