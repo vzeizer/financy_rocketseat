@@ -19,7 +19,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-export function Login() {
+export function Login({ onSwitchToRegister }: { onSwitchToRegister?: () => void }) {
   const { login: saveAuthContext } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
@@ -88,6 +88,16 @@ export function Login() {
           >
             {loading ? 'Acessando conta...' : 'Entrar no Painel'}
           </button>
+
+          {onSwitchToRegister && (
+            <button
+              type="button"
+              onClick={onSwitchToRegister}
+              className="w-full text-brand-primary font-semibold py-2 rounded-xl hover:bg-brand-primary/5 transition-colors"
+            >
+              Criar conta
+            </button>
+          )}
         </form>
       </div>
     </div>

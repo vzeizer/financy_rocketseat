@@ -1,7 +1,13 @@
 import { useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { IconMapper } from '../../lib/icon-mapper';
-import { NewTransactionModal } from './NewTransactionModal';
+import { NewTransactionModal } from './NewTransactionalModal';
+
+const DELETE_TRANSACTION = gql`
+  mutation DeleteTransaction($id: ID!) {
+    deleteTransaction(id: $id)
+  }
+`;
 
 const GET_TRANSACTIONS_PAGE = gql`
   query GetTransactionsPage {
@@ -25,6 +31,7 @@ const GET_TRANSACTIONS_PAGE = gql`
 
 export function Transactions() {
   const { data, loading, refetch } = useQuery(GET_TRANSACTIONS_PAGE);
+  const [deleteTransactionMutation] = useMutation(DELETE_TRANSACTION);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Estados dos filtros da barra superior
@@ -33,6 +40,13 @@ export function Transactions() {
   const [categoryFilter, setCategoryFilter] = useState('ALL');
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando listagem...</div>;
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir esta transação?')) {
+      await deleteTransactionMutation({ variables: { id } });
+      refetch();
+    }
+  };
 
   const transactions = data?.transactions || [];
   const categories = data?.categories || [];
@@ -146,7 +160,7 @@ export function Transactions() {
                 <tr key={t.id} className="hover:bg-neutral-bg/30 transition-colors">
                   <td className="py-4 px-6 font-medium">{t.title}</td>
                   <td className="py-4 px-6 text-neutral-dark">
-                    {new Date(Number(t.date) || Date.now()).toLocaleDateString('pt-BR')}
+                    {new Date(t.date).toLocaleDateString('pt-BR')}
                   </td>
                   <td className="py-4 px-6">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryTagStyle(idx)}`}>
@@ -174,7 +188,11 @@ export function Transactions() {
                       <button className="p-1.5 text-neutral-medium hover:text-brand-primary border border-transparent hover:border-neutral-light rounded-lg transition-all" title="Editar">
                         <IconMapper name="square-pen.svg" size={16} />
                       </button>
-                      <button className="p-1.5 text-neutral-medium hover:text-feedback-error border border-transparent hover:border-neutral-light rounded-lg transition-all" title="Excluir">
+                      <button 
+                        onClick={() => handleDelete(t.id)}
+                        className="p-1.5 text-neutral-medium hover:text-feedback-error border border-transparent hover:border-neutral-light rounded-lg transition-all" 
+                        title="Excluir"
+                      >
                         <IconMapper name="trash.svg" size={16} />
                       </button>
                     </div>

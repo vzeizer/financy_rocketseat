@@ -9,9 +9,10 @@ const GET_DASHBOARD_DATA = gql`
 `;
 
 export function Dashboard() {
-  const { data, loading } = useQuery(GET_DASHBOARD_DATA);
+  const { data, loading, error } = useQuery(GET_DASHBOARD_DATA);
 
   if (loading) return <div className="text-center py-12">Carregando dados financeiros...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">Erro ao carregar dados: {error.message}</div>;
 
   const transactions = data?.transactions || [];
   
@@ -69,7 +70,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">{t.title}</h4>
-                    <span className="text-xs text-gray-400">{new Date(Number(t.date) || Date.now()).toLocaleDateString('pt-BR')}</span>
+                    <span className="text-xs text-gray-400">{new Date(t.date).toLocaleDateString('pt-BR')}</span>
                   </div>
                 </div>
                 <div className="text-right">

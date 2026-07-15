@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { IconMapper } from '../../lib/icon-mapper';
 import { NewCategoryModal } from './NewCategoryModal';
 
@@ -19,11 +19,25 @@ const GET_CATEGORIES_PAGE = gql`
   }
 `;
 
+const DELETE_CATEGORY = gql`
+  mutation DeleteCategory($id: ID!) {
+    deleteCategory(id: $id)
+  }
+`;
+
 export function Categories() {
   const { data, loading, refetch } = useQuery(GET_CATEGORIES_PAGE);
+  const [deleteCategoryMutation] = useMutation(DELETE_CATEGORY);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando categorias...</div>;
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir esta categoria?')) {
+      await deleteCategoryMutation({ variables: { id } });
+      refetch();
+    }
+  };
 
   const categories = data?.categories || [];
   const transactions = data?.transactions || [];
@@ -98,7 +112,10 @@ export function Categories() {
                 <button className="p-1 text-neutral-medium hover:text-brand-primary rounded-md">
                   <IconMapper name="square-pen.svg" size={14} />
                 </button>
-                <button className="p-1 text-neutral-medium hover:text-feedback-error rounded-md">
+                <button 
+                  onClick={() => handleDelete(c.id)}
+                  className="p-1 text-neutral-medium hover:text-feedback-error rounded-md"
+                >
                   <IconMapper name="trash.svg" size={14} />
                 </button>
               </div>
