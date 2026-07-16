@@ -15,8 +15,14 @@ coverage/
 
 # Prisma
 prisma/*.db
+prisma/*.db-journal
+prisma/*.db-shm
+prisma/*.db-wal
 prisma/migrations/
 *.db
+*.db-journal
+*.db-shm
+*.db-wal
 prisma/dev.db
 
 # IDE
