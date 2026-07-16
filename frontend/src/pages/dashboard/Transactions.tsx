@@ -3,6 +3,13 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { IconMapper } from '../../lib/icon-mapper';
 import { NewTransactionModal } from './NewTransactionalModal';
 
+const PERIOD_ALL = 'ALL';
+
+const parseValidDate = (value: unknown): Date | null => {
+  const date = new Date(value as string | number | Date);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 const DELETE_TRANSACTION = gql`
   mutation DeleteTransaction($id: ID!) {
     deleteTransaction(id: $id)
@@ -32,12 +39,14 @@ const GET_TRANSACTIONS_PAGE = gql`
 export function Transactions() {
   const { data, loading, refetch } = useQuery(GET_TRANSACTIONS_PAGE);
   const [deleteTransactionMutation] = useMutation(DELETE_TRANSACTION);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<any | null>(null);
   
   // Estados dos filtros da barra superior
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [periodFilter, setPeriodFilter] = useState(PERIOD_ALL);
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando listagem...</div>;
 
@@ -48,15 +57,36 @@ export function Transactions() {
     }
   };
 
-  const transactions = data?.transactions || [];
-  const categories = data?.categories || [];
+  const transactions: any[] = data?.transactions || [];
+  const categories: any[] = data?.categories || [];
+
+  const periodOptions: string[] = Array.from(
+    new Set(
+      transactions.map((transaction) => {
+        const date = parseValidDate(transaction.date);
+        if (!date) return null;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      }).filter(Boolean) as string[]
+    )
+  ).sort((a, b) => b.localeCompare(a));
+
+  const formatPeriodLabel = (period: string) => {
+    const [year, month] = period.split('-').map(Number);
+    const date = new Date(year, month - 1, 1);
+    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  };
 
   // Lógica de filtragem em memória para DX fluída
   const filteredTransactions = transactions.filter((t: any) => {
     const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'ALL' || t.type === typeFilter;
     const matchesCategory = categoryFilter === 'ALL' || t.category?.id === categoryFilter;
-    return matchesSearch && matchesType && matchesCategory;
+    const transactionDate = parseValidDate(t.date);
+    const transactionPeriod = transactionDate
+      ? `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`
+      : null;
+    const matchesPeriod = periodFilter === PERIOD_ALL || transactionPeriod === periodFilter;
+    return matchesSearch && matchesType && matchesCategory && matchesPeriod;
   });
 
   // Função auxiliar de estilo para colorir os pills das categorias de forma rotativa
@@ -80,7 +110,7 @@ export function Transactions() {
           <p className="text-sm text-neutral-medium">Gerencie todas as suas transações financeiras</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsCreateModalOpen(true)}
           className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
         >
           <IconMapper name="plus.svg" size={18} />
@@ -135,8 +165,17 @@ export function Transactions() {
 
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-bold text-neutral-dark uppercase tracking-wider">Período</label>
-          <select className="w-full px-3 py-2.5 border border-neutral-light rounded-xl text-sm bg-white text-neutral-darkest" disabled>
-            <option>Junho / 2026</option>
+          <select
+            value={periodFilter}
+            onChange={(e) => setPeriodFilter(e.target.value)}
+            className="w-full px-3 py-2.5 border border-neutral-light rounded-xl text-sm bg-white text-neutral-darkest"
+          >
+            <option value={PERIOD_ALL}>Todos</option>
+            {periodOptions.map((period) => (
+              <option key={period} value={period}>
+                {formatPeriodLabel(period)}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -160,7 +199,7 @@ export function Transactions() {
                 <tr key={t.id} className="hover:bg-neutral-bg/30 transition-colors">
                   <td className="py-4 px-6 font-medium">{t.title}</td>
                   <td className="py-4 px-6 text-neutral-dark">
-                    {new Date(t.date).toLocaleDateString('pt-BR')}
+                    {parseValidDate(t.date)?.toLocaleDateString('pt-BR') || '--'}
                   </td>
                   <td className="py-4 px-6">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryTagStyle(idx)}`}>
@@ -185,7 +224,11 @@ export function Transactions() {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex justify-center gap-2">
-                      <button className="p-1.5 text-neutral-medium hover:text-brand-primary border border-transparent hover:border-neutral-light rounded-lg transition-all" title="Editar">
+                      <button
+                        onClick={() => setEditingTransaction(t)}
+                        className="p-1.5 text-neutral-medium hover:text-brand-primary border border-transparent hover:border-neutral-light rounded-lg transition-all"
+                        title="Editar"
+                      >
                         <IconMapper name="square-pen.svg" size={16} />
                       </button>
                       <button 
@@ -226,10 +269,19 @@ export function Transactions() {
       </div>
 
       {/* Controle de Modal */}
-      {isModalOpen && (
+      {isCreateModalOpen && (
         <NewTransactionModal 
           categories={categories} 
-          onClose={() => setIsModalOpen(false)} 
+          onClose={() => setIsCreateModalOpen(false)} 
+          onRefresh={() => refetch()} 
+        />
+      )}
+
+      {editingTransaction && (
+        <NewTransactionModal
+          initialData={editingTransaction}
+          categories={categories}
+          onClose={() => setEditingTransaction(null)}
           onRefresh={() => refetch()} 
         />
       )}

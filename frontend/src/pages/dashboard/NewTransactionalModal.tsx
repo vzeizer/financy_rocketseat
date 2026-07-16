@@ -8,25 +8,80 @@ const transactionSchema = zod.object({
   amount: zod.number().positive('Insira um valor válido.'),
   type: zod.enum(['INCOME', 'EXPENSE']),
   categoryId: zod.string().min(1, 'Selecione uma categoria.'),
+  date: zod
+    .string()
+    .min(1, 'A data é obrigatória.')
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), 'Insira uma data válida.'),
 });
 
 const CREATE_TRANSACTION = gql`
-  mutation CreateTransaction($title: String!, $amount: Float!, $type: String!, $categoryId: String!) {
-    createTransaction(title: $title, amount: $amount, type: $type, categoryId: $categoryId) { id }
+  mutation CreateTransaction($title: String!, $amount: Float!, $type: String!, $categoryId: String!, $date: String!) {
+    createTransaction(title: $title, amount: $amount, type: $type, categoryId: $categoryId, date: $date) { id }
   }
 `;
 
-export function NewTransactionModal({ categories, onClose, onRefresh }: any) {
+const UPDATE_TRANSACTION = gql`
+  mutation UpdateTransaction($id: ID!, $title: String, $amount: Float, $type: String, $categoryId: String, $date: String) {
+    updateTransaction(id: $id, title: $title, amount: $amount, type: $type, categoryId: $categoryId, date: $date) { id }
+  }
+`;
+
+const formatDateForInput = (value?: string) => {
+  if (!value) return new Date().toISOString().slice(0, 10);
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.slice(0, 10);
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return new Date().toISOString().slice(0, 10);
+  return date.toISOString().slice(0, 10);
+};
+
+interface TransactionData {
+  id: string;
+  title: string;
+  amount: number;
+  type: 'INCOME' | 'EXPENSE';
+  date: string;
+  category?: { id: string; name: string };
+}
+
+interface NewTransactionModalProps {
+  categories: Array<{ id: string; name: string }>;
+  onClose: () => void;
+  onRefresh: () => void;
+  initialData?: TransactionData | null;
+}
+
+export function NewTransactionModal({ categories, onClose, onRefresh, initialData = null }: NewTransactionModalProps) {
+  const isEditMode = Boolean(initialData);
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     resolver: zodResolver(transactionSchema),
-    defaultValues: { type: 'EXPENSE', title: '', amount: 0, categoryId: '' }
+    defaultValues: {
+      type: initialData?.type ?? 'EXPENSE',
+      title: initialData?.title ?? '',
+      amount: initialData?.amount ?? 0,
+      categoryId: initialData?.category?.id ?? '',
+      date: formatDateForInput(initialData?.date),
+    }
   });
 
   const selectedType = watch('type');
   const [createTransaction] = useMutation(CREATE_TRANSACTION);
+  const [updateTransaction] = useMutation(UPDATE_TRANSACTION);
 
   const onSubmit = async (data: any) => {
-    await createTransaction({ variables: data });
+    if (isEditMode && initialData) {
+      await updateTransaction({
+        variables: {
+          id: initialData.id,
+          ...data,
+        },
+      });
+    } else {
+      await createTransaction({ variables: data });
+    }
     onRefresh();
     onClose();
   };
@@ -37,8 +92,8 @@ export function NewTransactionModal({ categories, onClose, onRefresh }: any) {
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
         
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Nova transação</h2>
-          <p className="text-sm text-gray-400">Registre sua despesa ou receita</p>
+          <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Editar transação' : 'Nova transação'}</h2>
+          <p className="text-sm text-gray-400">{isEditMode ? 'Atualize os dados da transação' : 'Registre sua despesa ou receita'}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -86,8 +141,18 @@ export function NewTransactionModal({ categories, onClose, onRefresh }: any) {
             {errors.categoryId && <span className="text-xs text-red-500">{errors.categoryId.message}</span>}
           </div>
 
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Data</label>
+            <input
+              {...register('date')}
+              type="date"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500"
+            />
+            {errors.date && <span className="text-xs text-red-500">{errors.date.message}</span>}
+          </div>
+
           <button type="submit" className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors shadow-md">
-            Salvar Transação
+            {isEditMode ? 'Salvar alterações' : 'Salvar transação'}
           </button>
         </form>
       </div>
