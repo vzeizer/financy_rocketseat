@@ -3,7 +3,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 interface User { id: string; name: string; email: string; }
 interface AuthContextData { signed: boolean; user: User | null; login(token: string, user: User): void; logout(): void; }
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
