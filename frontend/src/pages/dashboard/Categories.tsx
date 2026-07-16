@@ -28,7 +28,8 @@ const DELETE_CATEGORY = gql`
 export function Categories() {
   const { data, loading, refetch } = useQuery(GET_CATEGORIES_PAGE);
   const [deleteCategoryMutation] = useMutation(DELETE_CATEGORY);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{ id: string; name: string } | null>(null);
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando categorias...</div>;
 
@@ -38,6 +39,8 @@ export function Categories() {
       refetch();
     }
   };
+
+  const handleEdit = (category: { id: string; name: string }) => setEditingCategory(category);
 
   const categories = data?.categories || [];
   const transactions = data?.transactions || [];
@@ -60,7 +63,7 @@ export function Categories() {
           <p className="text-sm text-neutral-medium">Organize suas transações por categorias</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsCreateModalOpen(true)}
           className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
         >
           <IconMapper name="plus.svg" size={18} />
@@ -109,7 +112,10 @@ export function Categories() {
             <div key={c.id} className="bg-white p-5 rounded-2xl border border-neutral-light shadow-sm flex flex-col justify-between gap-6 hover:shadow-md transition-shadow relative group">
               {/* Botões de Ação Flutuantes */}
               <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-1 text-neutral-medium hover:text-brand-primary rounded-md">
+                <button
+                  onClick={() => handleEdit(c)}
+                  className="p-1 text-neutral-medium hover:text-brand-primary rounded-md"
+                >
                   <IconMapper name="square-pen.svg" size={14} />
                 </button>
                 <button 
@@ -139,10 +145,18 @@ export function Categories() {
         })}
       </div>
 
-      {isModalOpen && (
+      {isCreateModalOpen && (
         <NewCategoryModal 
-          onClose={() => setIsModalOpen(false)} 
+          onClose={() => setIsCreateModalOpen(false)} 
           onRefresh={() => refetch()} 
+        />
+      )}
+
+      {editingCategory && (
+        <NewCategoryModal
+          initialData={editingCategory}
+          onClose={() => setEditingCategory(null)}
+          onRefresh={() => refetch()}
         />
       )}
     </div>

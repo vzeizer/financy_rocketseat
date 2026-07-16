@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { useMutation, gql } from '@apollo/client';
+import { useState } from 'react';
 import { IconMapper } from '../../lib/icon-mapper';
 
 const categorySchema = zod.object({
@@ -14,22 +15,44 @@ const CREATE_CATEGORY = gql`
   }
 `;
 
-export function NewCategoryModal({ onClose, onRefresh }: any) {
+const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory($id: ID!, $name: String!) {
+    updateCategory(id: $id, name: $name) { id }
+  }
+`;
+
+interface NewCategoryModalProps {
+  onClose: () => void;
+  onRefresh: () => void;
+  initialData?: { id: string; name: string } | null;
+}
+
+export function NewCategoryModal({ onClose, onRefresh, initialData = null }: NewCategoryModalProps) {
+  const isEditMode = Boolean(initialData);
+  const iconOptions = ['utensils', 'car-front', 'shopping-cart', 'heart-pulse', 'briefcase-business', 'dumbbell'];
+  const colorOptions = ['#2563EB', '#7C3AED', '#DB2777', '#EA580C', '#CA8A04', '#168054'];
+  const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
+  const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
+
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(categorySchema)
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: initialData?.name ?? '',
+    },
   });
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
+  const [updateCategory] = useMutation(UPDATE_CATEGORY);
 
   const onSubmit = async (data: any) => {
-    await createCategory({ variables: { name: data.name } });
+    if (isEditMode && initialData) {
+      await updateCategory({ variables: { id: initialData.id, name: data.name } });
+    } else {
+      await createCategory({ variables: { name: data.name } });
+    }
     onRefresh();
     onClose();
   };
-
-  // Amostra de ícones usando IconMapper
-  const iconOptions = ['utensils', 'car-front', 'shopping-cart', 'heart-pulse', 'briefcase-business', 'dumbbell'];
-  const colorOptions = ['#2563EB', '#7C3AED', '#DB2777', '#EA580C', '#CA8A04', '#168054'];
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -37,8 +60,8 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
         <button onClick={onClose} className="absolute top-4 right-4 text-neutral-medium hover:text-neutral-dark">✕</button>
         
         <div>
-          <h2 className="text-xl font-bold text-neutral-darkest">Nova categoria</h2>
-          <p className="text-sm text-neutral-medium">Organize suas transações com categorias</p>
+          <h2 className="text-xl font-bold text-neutral-darkest">{isEditMode ? 'Editar categoria' : 'Nova categoria'}</h2>
+          <p className="text-sm text-neutral-medium">{isEditMode ? 'Atualize os dados da categoria' : 'Organize suas transações com categorias'}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -61,7 +84,13 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
                 <button 
                   key={icon} 
                   type="button" 
-                  className="p-2.5 border border-neutral-light hover:border-brand-primary rounded-xl flex items-center justify-center text-neutral-dark transition-all bg-white"
+                  onClick={() => setSelectedIcon(icon)}
+                  aria-label={`Selecionar ícone ${icon}`}
+                  className={`p-2.5 border rounded-xl flex items-center justify-center transition-all bg-white ${
+                    selectedIcon === icon
+                      ? 'border-brand-primary ring-2 ring-brand-primary/25 text-brand-primary'
+                      : 'border-neutral-light hover:border-brand-primary text-neutral-dark'
+                  }`}
                 >
                   <IconMapper name={`${icon}.svg`} size={20} />
                 </button>
@@ -77,15 +106,21 @@ export function NewCategoryModal({ onClose, onRefresh }: any) {
                 <button 
                   key={color} 
                   type="button" 
+                  onClick={() => setSelectedColor(color)}
                   style={{ backgroundColor: color }}
-                  className="w-7 h-7 rounded-full border border-black/10 hover:scale-110 transition-transform cursor-pointer"
+                  aria-label={`Selecionar cor ${color}`}
+                  className={`w-7 h-7 rounded-full transition-transform cursor-pointer hover:scale-110 ${
+                    selectedColor === color
+                      ? 'ring-2 ring-offset-2 ring-brand-primary border border-white'
+                      : 'border border-black/10'
+                  }`}
                 />
               ))}
             </div>
           </div>
 
           <button type="submit" className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors shadow-sm mt-2">
-            Salvar Categoria
+            {isEditMode ? 'Salvar alterações' : 'Salvar categoria'}
           </button>
         </form>
       </div>
