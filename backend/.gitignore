@@ -17,6 +17,7 @@ coverage/
 prisma/*.db
 prisma/migrations/
 *.db
+prisma/dev.db
 
 # IDE
 .idea/

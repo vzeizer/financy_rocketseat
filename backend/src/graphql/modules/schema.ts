@@ -6,6 +6,16 @@ import { authResolvers } from './auth/auth.resolvers';
 import { categoryResolvers } from './category/category.resolvers';
 import { transactionResolvers } from './transaction/transaction.resolvers';
 
+type ResolverModule = {
+  Query?: Record<string, unknown>;
+  Mutation?: Record<string, unknown>;
+  Transaction?: Record<string, unknown>;
+};
+
+const authModule = authResolvers as ResolverModule;
+const categoryModule = categoryResolvers as ResolverModule;
+const transactionModule = transactionResolvers as ResolverModule;
+
 // TypeDefs base que declaram os tipos Query e Mutation vazios para extensão
 const baseTypeDefs = gql`
   type Query {
@@ -26,7 +36,17 @@ export const typeDefs = [
 
 // Combina todos os resolvers modulares
 export const resolvers = {
-  ...authResolvers,
-  ...categoryResolvers,
-  ...transactionResolvers,
+  Query: {
+    ...(authModule.Query || {}),
+    ...(categoryModule.Query || {}),
+    ...(transactionModule.Query || {}),
+  },
+  Mutation: {
+    ...(authModule.Mutation || {}),
+    ...(categoryModule.Mutation || {}),
+    ...(transactionModule.Mutation || {}),
+  },
+  Transaction: {
+    ...(transactionModule.Transaction || {}),
+  },
 };
