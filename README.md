@@ -36,6 +36,15 @@ O **Financy** é uma aplicação FullStack desenvolvida como desafio prático da
 - ✅ **Filtros Avançados** — Busca por descrição, tipo (entrada/saída), categoria e período
 - ✅ **Isolamento de Dados** — Cada usuário vê e gerencia apenas seus próprios dados
 
+### Melhorias Recentes
+
+- ✅ **Correção do `register` no GraphQL** — Merge profundo dos resolvers por módulo, evitando sobrescrita de `Mutation`.
+- ✅ **Ícones locais integrados** — Aplicação passou a usar os SVGs de `frontend/src/assets/Icon` via `IconMapper`.
+- ✅ **Pipeline de estilo estabilizado** — Configuração de PostCSS adicionada para garantir processamento do Tailwind.
+- ✅ **Modais de edição implementados** — Edição de categorias e transações agora abre modal no mesmo padrão da criação.
+- ✅ **Data de transação validada ponta a ponta** — Campo de data no formulário, validação no frontend e backend, e serialização consistente em ISO no GraphQL.
+- ✅ **Filtro de período funcional** — Dropdown de período preenchido dinamicamente conforme os meses existentes nas transações.
+
 ### Tecnologias Utilizadas
 
 | Camada | Tecnologia | Finalidade |
@@ -52,7 +61,7 @@ O **Financy** é uma aplicação FullStack desenvolvida como desafio prático da
 | | TailwindCSS | Estilização utilitária |
 | | Zod | Validação de formulários |
 | | React Hook Form | Gerenciamento de formulários |
-| | Lucide React | Ícones |
+| | SVGs locais + IconMapper | Ícones da aplicação |
 | | Radix UI | Componentes acessíveis (Dialog, Select) |
 
 ---
@@ -95,13 +104,16 @@ financy/
 │   │   │   ├── mutations/      # Mutations GraphQL
 │   │   │   └── queries/        # Queries GraphQL
 │   │   ├── lib/
-│   │   │   └── icon-mapper.tsx # Mapeador de ícones Lucide
+│   │   │   └── icon-mapper.tsx # Mapeador de ícones para SVGs locais
+│   │   ├── assets/
+│   │   │   └── Icon/            # Biblioteca de ícones SVG do projeto
 │   │   ├── pages/
 │   │   │   ├── auth/           # Login e Register
 │   │   │   └── dashboard/      # Dashboard, Transações, Categorias
 │   │   └── styles/
 │   │       └── global.css      # Estilos globais Tailwind
 │   ├── .env.example
+│   ├── postcss.config.js
 │   ├── tailwind.config.js
 │   ├── vite.config.ts
 │   └── package.json
@@ -258,11 +270,11 @@ O desafio exige as seguintes funcionalidades, todas implementadas:
 - [x] Usuário pode ver e gerenciar apenas transações e categorias criadas por ele
 - [x] Criar transação
 - [x] Deletar transação
-- [x] Editar transação (botão implementado, aguarda modal)
+- [x] Editar transação (via modal)
 - [x] Listar todas as transações
 - [x] Criar categoria
 - [x] Deletar categoria
-- [x] Editar categoria (botão implementado, aguarda modal)
+- [x] Editar categoria (via modal)
 - [x] Listar todas as categorias
 
 ### Tecnologias (Obrigatórias)
@@ -273,7 +285,7 @@ O desafio exige as seguintes funcionalidades, todas implementadas:
 - [x] React
 - [x] Vite
 - [x] TailwindCSS (opcional, mas implementado)
-- [x] React Query (não implementado - usando Apollo Client)
+- [x] Apollo Client (consumo da API GraphQL)
 
 ---
 
