@@ -89,6 +89,7 @@ describe('TransactionService', () => {
           amount: 5000,
           type: 'INCOME',
           categoryId: '1',
+          date: '2026-07-16',
         },
         'user1'
       );
@@ -102,6 +103,7 @@ describe('TransactionService', () => {
           amount: 5000,
           type: 'INCOME',
           categoryId: '1',
+          date: expect.any(Date),
           userId: 'user1',
         },
         include: { category: true },
@@ -119,6 +121,7 @@ describe('TransactionService', () => {
             amount: 5000,
             type: 'INCOME',
             categoryId: '1',
+            date: '2026-07-16',
           },
           'user1'
         )
@@ -135,6 +138,7 @@ describe('TransactionService', () => {
             amount: 5000,
             type: 'INCOME',
             categoryId: '1',
+            date: '2026-07-16',
           },
           'user2'
         )

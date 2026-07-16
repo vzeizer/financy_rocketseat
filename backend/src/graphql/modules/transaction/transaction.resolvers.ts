@@ -28,5 +28,13 @@ export const transactionResolvers = {
       if (parent.category) return parent.category;
       return prisma.category.findUnique({ where: { id: parent.categoryId } });
     },
+    date: (parent: any) => {
+      if (parent.date instanceof Date) return parent.date.toISOString();
+      if (typeof parent.date === 'string') {
+        const parsed = new Date(parent.date);
+        if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+      }
+      return new Date(0).toISOString();
+    },
   },
 };
