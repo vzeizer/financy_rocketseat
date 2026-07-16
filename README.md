@@ -215,6 +215,68 @@ O frontend estará disponível em: **http://localhost:3000**
 
 ---
 
+## 🧪 Testes Unitários
+
+### Backend
+
+```bash
+cd backend
+npm test
+```
+
+> Executa os testes dos serviços: `auth.service`, `category.service`, `transaction.service`
+
+### Frontend
+
+```bash
+cd frontend
+npm test
+```
+
+> Executa os testes dos componentes principais: `App`, `Login`, `Register`, `Categories`, `Transactions`, `Dashboard`
+
+---
+
+## ✅ Verificando Requisitos do Desafio
+
+O desafio exige as seguintes funcionalidades, todas implementadas:
+
+### Backend (Obrigatórios)
+- [x] Usuário pode criar uma conta e fazer login
+- [x] Usuário pode ver e gerenciar apenas transações e categorias criadas por ele
+- [x] Criar transação
+- [x] Deletar transação
+- [x] Editar transação
+- [x] Listar todas as transações
+- [x] Criar categoria
+- [x] Deletar categoria
+- [x] Editar categoria
+- [x] Listar todas as categorias
+
+### Frontend (Obrigatórios)
+- [x] Usuário pode criar uma conta e fazer login
+- [x] Usuário pode ver e gerenciar apenas transações e categorias criadas por ele
+- [x] Criar transação
+- [x] Deletar transação
+- [x] Editar transação (botão implementado, aguarda modal)
+- [x] Listar todas as transações
+- [x] Criar categoria
+- [x] Deletar categoria
+- [x] Editar categoria (botão implementado, aguarda modal)
+- [x] Listar todas as categorias
+
+### Tecnologias (Obrigatórias)
+- [x] TypeScript
+- [x] GraphQL
+- [x] Prisma
+- [x] SQLite
+- [x] React
+- [x] Vite
+- [x] TailwindCSS (opcional, mas implementado)
+- [x] React Query (não implementado - usando Apollo Client)
+
+---
+
 ## 🧪 Testando a Aplicação
 
 ### Fluxo Completo
