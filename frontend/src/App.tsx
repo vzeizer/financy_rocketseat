@@ -24,30 +24,30 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Header Global extraído do Figma */}
-      <header className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-12 flex-1">
-          <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl tracking-tight">
+      <header className="bg-white border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-12 flex-1 min-w-0 w-full">
+          <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl tracking-tight justify-center lg:justify-start">
             <IconMapper name="wallet.svg" className="text-emerald-500" />
             <span>FINANCY</span>
           </div>
-          <nav className="flex-1 flex justify-center gap-6 font-medium text-gray-500">
+          <nav className="flex-1 flex justify-start lg:justify-center gap-2 sm:gap-4 lg:gap-6 font-medium text-gray-500 overflow-x-auto pb-1 lg:pb-0">
             <button 
               onClick={() => setCurrentTab('dashboard')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[112px] sm:min-w-[128px] px-2 py-1 whitespace-nowrap ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="house.svg" size={15} />
               Dashboard
             </button>
             <button 
               onClick={() => setCurrentTab('transactions')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[112px] sm:min-w-[128px] px-2 py-1 whitespace-nowrap ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="receipt-text.svg" size={15} />
               Transações
             </button>
             <button 
               onClick={() => setCurrentTab('categories')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[112px] sm:min-w-[128px] px-2 py-1 whitespace-nowrap ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="tag.svg" size={15} />
               Categorias
@@ -56,7 +56,7 @@ export default function App() {
         </div>
         
         {/* Avatar do Usuário */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-3 w-full lg:w-auto">
           <button
             onClick={() => setHideSensitiveData((prev) => !prev)}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -74,7 +74,7 @@ export default function App() {
       </header>
 
       {/* Conteúdo Dinâmico Baseado nas Abas */}
-      <main className="flex-1 p-8 max-w-7xl w-full mx-auto">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
         {currentTab === 'dashboard' && <Dashboard hideSensitiveData={hideSensitiveData} />}
         {currentTab === 'transactions' && <Transactions hideSensitiveData={hideSensitiveData} />}
         {currentTab === 'categories' && <Categories />}
