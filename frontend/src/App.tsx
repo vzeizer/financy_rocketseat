@@ -64,8 +64,8 @@ export default function App() {
           >
             <IconMapper name={hideSensitiveData ? 'eye.svg' : 'eye-closed.svg'} size={18} />
           </button>
-          <div className="w-10 h-10 bg-gray-200 text-gray-700 font-bold rounded-full flex items-center justify-center border border-gray-300 uppercase cursor-pointer" title={user?.email}>
-            {hideSensitiveData ? '••' : user?.name.substring(0, 2)}
+          <div className="w-10 h-10 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center border border-gray-300 cursor-pointer" title={user?.email}>
+            <IconMapper name="user-round.svg" size={18} className={hideSensitiveData ? 'opacity-60' : ''} />
           </div>
           <button onClick={logout} className="text-gray-400 hover:text-red-500 transition-colors">
             <IconMapper name="log-out.svg" size={18} />
