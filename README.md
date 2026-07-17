@@ -35,6 +35,9 @@ O **Financy** é uma aplicação FullStack desenvolvida como desafio prático da
 - ✅ **Dashboard Financeiro** — Visão geral com saldo, receitas, despesas e transações recentes
 - ✅ **Filtros Avançados** — Busca por descrição, tipo (entrada/saída), categoria e período
 - ✅ **Isolamento de Dados** — Cada usuário vê e gerencia apenas seus próprios dados
+- ✅ **Confirmação de Exclusão por Modal** — Exclusão de categorias e transações com modal de confirmação
+- ✅ **Privacidade de Dados** — Toggle para ocultar valores sensíveis na interface
+- ✅ **Layout Responsivo** — Header, navegação e páginas adaptados para desktop/mobile
 
 ### Melhorias Recentes
 
@@ -42,8 +45,11 @@ O **Financy** é uma aplicação FullStack desenvolvida como desafio prático da
 - ✅ **Ícones locais integrados** — Aplicação passou a usar os SVGs de `frontend/src/assets/Icon` via `IconMapper`.
 - ✅ **Pipeline de estilo estabilizado** — Configuração de PostCSS adicionada para garantir processamento do Tailwind.
 - ✅ **Modais de edição implementados** — Edição de categorias e transações agora abre modal no mesmo padrão da criação.
+- ✅ **Modal de exclusão implementado** — Substituição de `alert/confirm` por componente reutilizável de confirmação.
 - ✅ **Data de transação validada ponta a ponta** — Campo de data no formulário, validação no frontend e backend, e serialização consistente em ISO no GraphQL.
-- ✅ **Filtro de período funcional** — Dropdown de período preenchido dinamicamente conforme os meses existentes nas transações.
+- ✅ **Filtro de período funcional** — Dropdown de período preenchido dinamicamente e formatado como `Mês / Ano`.
+- ✅ **Categorias com identidade visual persistente** — Ícone e cor da categoria são salvos no banco e refletidos na UI.
+- ✅ **CORS habilitado no backend** — API pronta para consumo pelo frontend local durante desenvolvimento/avaliação.
 
 ### Tecnologias Utilizadas
 
@@ -73,6 +79,7 @@ financy/
 ├── backend/                    # API GraphQL
 │   ├── prisma/
 │   │   ├── schema.prisma       # Modelo de dados (User, Category, Transaction)
+│   │   ├── migrations/          # Histórico de migrations do Prisma
 │   │   └── dev.db              # Banco SQLite local
 │   ├── src/
 │   │   ├── server.ts           # Ponto de entrada do servidor
@@ -110,6 +117,8 @@ financy/
 │   │   ├── pages/
 │   │   │   ├── auth/           # Login e Register
 │   │   │   └── dashboard/      # Dashboard, Transações, Categorias
+│   │   ├── components/
+│   │   │   └── ConfirmDeleteModal.tsx # Modal reutilizável de confirmação
 │   │   └── styles/
 │   │       └── global.css      # Estilos globais Tailwind
 │   ├── .env.example
@@ -340,11 +349,11 @@ query ListTransactions {
 |----------|-----------|:---:|
 | `register(name, email, password)` | Criar nova conta | ❌ |
 | `login(email, password)` | Fazer login | ❌ |
-| `createCategory(name)` | Criar categoria | ✅ |
-| `updateCategory(id, name)` | Editar categoria | ✅ |
+| `createCategory(name, icon?, color?)` | Criar categoria | ✅ |
+| `updateCategory(id, name, icon?, color?)` | Editar categoria | ✅ |
 | `deleteCategory(id)` | Excluir categoria | ✅ |
-| `createTransaction(title, amount, type, categoryId)` | Criar transação | ✅ |
-| `updateTransaction(id, title, amount, type, categoryId)` | Editar transação | ✅ |
+| `createTransaction(title, amount, type, categoryId, date)` | Criar transação | ✅ |
+| `updateTransaction(id, title, amount, type, categoryId, date?)` | Editar transação | ✅ |
 | `deleteTransaction(id)` | Excluir transação | ✅ |
 
 | Query | Descrição | Autenticação |
@@ -378,6 +387,8 @@ model User {
 model Category {
   id           String        @id @default(uuid())
   name         String
+  icon         String        @default("tag.svg")
+  color        String        @default("#2563EB")
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
@@ -431,10 +442,9 @@ O design segue o layout do Figma com a seguinte paleta definida no Tailwind:
 
 - [ ] Upload de avatar do usuário
 - [ ] Paginação no backend (atualmente a filtragem é feita no frontend)
-- [ ] Modal de edição para transações e categorias
 - [ ] Filtro por período funcional no backend
 - [ ] Testes automatizados (unitários e E2E)
-- [ ] Responsividade mobile aprimorada
+- [ ] Melhorar cobertura de testes para fluxos de modal e responsividade
 - [ ] Dark mode
 
 ---
