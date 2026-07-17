@@ -10,29 +10,29 @@ const categorySchema = zod.object({
 });
 
 const CREATE_CATEGORY = gql`
-  mutation CreateCategory($name: String!) {
-    createCategory(name: $name) { id }
+  mutation CreateCategory($name: String!, $icon: String, $color: String) {
+    createCategory(name: $name, icon: $icon, color: $color) { id }
   }
 `;
 
 const UPDATE_CATEGORY = gql`
-  mutation UpdateCategory($id: ID!, $name: String!) {
-    updateCategory(id: $id, name: $name) { id }
+  mutation UpdateCategory($id: ID!, $name: String!, $icon: String, $color: String) {
+    updateCategory(id: $id, name: $name, icon: $icon, color: $color) { id }
   }
 `;
 
 interface NewCategoryModalProps {
   onClose: () => void;
   onRefresh: () => void;
-  initialData?: { id: string; name: string } | null;
+  initialData?: { id: string; name: string; icon?: string; color?: string } | null;
 }
 
 export function NewCategoryModal({ onClose, onRefresh, initialData = null }: NewCategoryModalProps) {
   const isEditMode = Boolean(initialData);
   const iconOptions = ['utensils', 'car-front', 'shopping-cart', 'heart-pulse', 'briefcase-business', 'dumbbell'];
   const colorOptions = ['#2563EB', '#7C3AED', '#DB2777', '#EA580C', '#CA8A04', '#168054'];
-  const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
-  const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
+  const [selectedIcon, setSelectedIcon] = useState((initialData?.icon || 'tag.svg').replace('.svg', ''));
+  const [selectedColor, setSelectedColor] = useState(initialData?.color || colorOptions[0]);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(categorySchema),
@@ -45,10 +45,16 @@ export function NewCategoryModal({ onClose, onRefresh, initialData = null }: New
   const [updateCategory] = useMutation(UPDATE_CATEGORY);
 
   const onSubmit = async (data: any) => {
+    const payload = {
+      name: data.name,
+      icon: `${selectedIcon}.svg`,
+      color: selectedColor,
+    };
+
     if (isEditMode && initialData) {
-      await updateCategory({ variables: { id: initialData.id, name: data.name } });
+      await updateCategory({ variables: { id: initialData.id, ...payload } });
     } else {
-      await createCategory({ variables: { name: data.name } });
+      await createCategory({ variables: payload });
     }
     onRefresh();
     onClose();

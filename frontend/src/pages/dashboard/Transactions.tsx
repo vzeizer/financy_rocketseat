@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { IconMapper } from '../../lib/icon-mapper';
 import { NewTransactionModal } from './NewTransactionalModal';
+import { ConfirmDeleteModal } from '../../components/ConfirmDeleteModal';
 
 const PERIOD_ALL = 'ALL';
 
@@ -27,11 +28,15 @@ const GET_TRANSACTIONS_PAGE = gql`
       category {
         id
         name
+        icon
+        color
       }
     }
     categories {
       id
       name
+      icon
+      color
     }
   }
 `;
@@ -41,6 +46,8 @@ export function Transactions() {
   const [deleteTransactionMutation] = useMutation(DELETE_TRANSACTION);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any | null>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<{ id: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Estados dos filtros da barra superior
   const [search, setSearch] = useState('');
@@ -50,10 +57,16 @@ export function Transactions() {
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando listagem...</div>;
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta transação?')) {
-      await deleteTransactionMutation({ variables: { id } });
+  const handleDelete = async () => {
+    if (!deletingTransaction) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteTransactionMutation({ variables: { id: deletingTransaction.id } });
+      setDeletingTransaction(null);
       refetch();
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -88,18 +101,6 @@ export function Transactions() {
     const matchesPeriod = periodFilter === PERIOD_ALL || transactionPeriod === periodFilter;
     return matchesSearch && matchesType && matchesCategory && matchesPeriod;
   });
-
-  // Função auxiliar de estilo para colorir os pills das categorias de forma rotativa
-  const getCategoryTagStyle = (index: number) => {
-    const styles = [
-      'bg-blue-50 text-blue-600',
-      'bg-purple-50 text-purple-600',
-      'bg-pink-50 text-pink-600',
-      'bg-orange-50 text-orange-600',
-      'bg-yellow-50 text-yellow-700'
-    ];
-    return styles[index % styles.length];
-  };
 
   return (
     <div className="space-y-6">
@@ -195,14 +196,21 @@ export function Transactions() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-light text-sm text-neutral-darkest">
-              {filteredTransactions.map((t: any, idx: number) => (
+              {filteredTransactions.map((t: any) => (
                 <tr key={t.id} className="hover:bg-neutral-bg/30 transition-colors">
                   <td className="py-4 px-6 font-medium">{t.title}</td>
                   <td className="py-4 px-6 text-neutral-dark">
                     {parseValidDate(t.date)?.toLocaleDateString('pt-BR') || '--'}
                   </td>
                   <td className="py-4 px-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryTagStyle(idx)}`}>
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                      style={{
+                        backgroundColor: `${t.category?.color || '#CBD5E1'}1A`,
+                        color: t.category?.color || '#334155',
+                      }}
+                    >
+                      <IconMapper name={t.category?.icon || 'tag.svg'} size={12} />
                       {t.category?.name || 'Geral'}
                     </span>
                   </td>
@@ -231,8 +239,8 @@ export function Transactions() {
                       >
                         <IconMapper name="square-pen.svg" size={16} />
                       </button>
-                      <button 
-                        onClick={() => handleDelete(t.id)}
+                      <button
+                        onClick={() => setDeletingTransaction({ id: t.id, title: t.title })}
                         className="p-1.5 text-neutral-medium hover:text-feedback-error border border-transparent hover:border-neutral-light rounded-lg transition-all" 
                         title="Excluir"
                       >
@@ -283,6 +291,16 @@ export function Transactions() {
           categories={categories}
           onClose={() => setEditingTransaction(null)}
           onRefresh={() => refetch()} 
+        />
+      )}
+
+      {deletingTransaction && (
+        <ConfirmDeleteModal
+          title="Excluir transação"
+          description={`Tem certeza que deseja excluir a transação \"${deletingTransaction.title}\"?`}
+          onCancel={() => setDeletingTransaction(null)}
+          onConfirm={handleDelete}
+          isLoading={isDeleting}
         />
       )}
     </div>

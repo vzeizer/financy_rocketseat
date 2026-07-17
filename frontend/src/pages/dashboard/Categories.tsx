@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { IconMapper } from '../../lib/icon-mapper';
 import { NewCategoryModal } from './NewCategoryModal';
+import { ConfirmDeleteModal } from '../../components/ConfirmDeleteModal';
 
 const GET_CATEGORIES_PAGE = gql`
   query GetCategoriesPage {
     categories {
       id
       name
+      icon
+      color
     }
     transactions {
       id
@@ -29,14 +32,22 @@ export function Categories() {
   const { data, loading, refetch } = useQuery(GET_CATEGORIES_PAGE);
   const [deleteCategoryMutation] = useMutation(DELETE_CATEGORY);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<{ id: string; name: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; icon?: string; color?: string } | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (loading) return <div className="text-center py-12 text-neutral-dark">Carregando categorias...</div>;
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta categoria?')) {
-      await deleteCategoryMutation({ variables: { id } });
+  const handleDelete = async () => {
+    if (!deletingCategory) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteCategoryMutation({ variables: { id: deletingCategory.id } });
+      setDeletingCategory(null);
       refetch();
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -118,8 +129,8 @@ export function Categories() {
                 >
                   <IconMapper name="square-pen.svg" size={14} />
                 </button>
-                <button 
-                  onClick={() => handleDelete(c.id)}
+                <button
+                  onClick={() => setDeletingCategory({ id: c.id, name: c.name })}
                   className="p-1 text-neutral-medium hover:text-feedback-error rounded-md"
                 >
                   <IconMapper name="trash.svg" size={14} />
@@ -127,8 +138,14 @@ export function Categories() {
               </div>
 
               <div className="space-y-3">
-                <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                  <IconMapper name="tag.svg" size={20} />
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{
+                    backgroundColor: `${c.color || '#2563EB'}1A`,
+                    color: c.color || '#2563EB',
+                  }}
+                >
+                  <IconMapper name={c.icon || 'tag.svg'} size={20} />
                 </div>
                 <div>
                   <h3 className="font-bold text-neutral-darkest text-base">{c.name}</h3>
@@ -157,6 +174,16 @@ export function Categories() {
           initialData={editingCategory}
           onClose={() => setEditingCategory(null)}
           onRefresh={() => refetch()}
+        />
+      )}
+
+      {deletingCategory && (
+        <ConfirmDeleteModal
+          title="Excluir categoria"
+          description={`Tem certeza que deseja excluir a categoria \"${deletingCategory.name}\"?`}
+          onCancel={() => setDeletingCategory(null)}
+          onConfirm={handleDelete}
+          isLoading={isDeleting}
         />
       )}
     </div>
