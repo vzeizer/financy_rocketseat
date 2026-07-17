@@ -25,29 +25,29 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Header Global extraído do Figma */}
       <header className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-12 flex-1">
           <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl tracking-tight">
             <IconMapper name="wallet.svg" className="text-emerald-500" />
             <span>FINANCY</span>
           </div>
-          <nav className="flex gap-6 font-medium text-gray-500">
+          <nav className="flex-1 flex justify-center gap-6 font-medium text-gray-500">
             <button 
               onClick={() => setCurrentTab('dashboard')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="house.svg" size={15} />
               Dashboard
             </button>
             <button 
               onClick={() => setCurrentTab('transactions')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="receipt-text.svg" size={15} />
               Transações
             </button>
             <button 
               onClick={() => setCurrentTab('categories')}
-              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center justify-center gap-1.5 min-w-[128px] ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
               <IconMapper name="tag.svg" size={15} />
               Categorias
