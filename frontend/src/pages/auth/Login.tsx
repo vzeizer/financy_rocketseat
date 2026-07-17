@@ -84,8 +84,9 @@ export function Login({ onSwitchToRegister }: { onSwitchToRegister?: () => void 
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors shadow-sm disabled:opacity-50 mt-2"
+            className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors shadow-sm disabled:opacity-50 mt-2 inline-flex items-center justify-center gap-2"
           >
+            <IconMapper name="log-in.svg" size={16} />
             {loading ? 'Acessando conta...' : 'Entrar no Painel'}
           </button>
 

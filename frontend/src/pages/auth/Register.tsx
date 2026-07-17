@@ -95,8 +95,9 @@ export function Register({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors shadow-sm disabled:opacity-50 mt-2"
+            className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors shadow-sm disabled:opacity-50 mt-2 inline-flex items-center justify-center gap-2"
           >
+            <IconMapper name="user-round-plus.svg" size={16} />
             {loading ? 'Criando conta...' : 'Cadastrar'}
           </button>
         </form>
