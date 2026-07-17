@@ -8,7 +8,11 @@ const GET_DASHBOARD_DATA = gql`
   }
 `;
 
-export function Dashboard() {
+interface DashboardProps {
+  hideSensitiveData?: boolean;
+}
+
+export function Dashboard({ hideSensitiveData = false }: DashboardProps) {
   const { data, loading, error } = useQuery(GET_DASHBOARD_DATA);
 
   if (loading) return <div className="text-center py-12">Carregando dados financeiros...</div>;
@@ -21,6 +25,11 @@ export function Dashboard() {
   const expense = transactions.filter((t: any) => t.type === 'EXPENSE').reduce((acc: number, curr: any) => acc + curr.amount, 0);
   const totalBalance = income - expense;
 
+  const formatCurrency = (value: number, hideSensitiveData?: boolean) => {
+    if (hideSensitiveData) return 'R$ •••••';
+    return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  };
+
   return (
     <div className="space-y-8">
       {/* Grid de Cards Superiores (KPIs) */}
@@ -28,10 +37,10 @@ export function Dashboard() {
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-2">
           <div className="flex justify-between items-center text-gray-400 font-semibold text-xs tracking-wider uppercase">
             <span>Saldo Total</span>
-            <IconMapper name="wallet.svg" className="text-purple-500" />
+            <IconMapper name="piggy-bank.svg" className="text-purple-500" />
           </div>
           <span className="text-3xl font-bold text-gray-800">
-            R$ {totalBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            {formatCurrency(totalBalance, hideSensitiveData)}
           </span>
         </div>
 
@@ -41,7 +50,7 @@ export function Dashboard() {
             <IconMapper name="circle-arrow-up.svg" className="text-emerald-500" />
           </div>
           <span className="text-3xl font-bold text-gray-800">
-            R$ {income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            {formatCurrency(income, hideSensitiveData)}
           </span>
         </div>
 
@@ -51,7 +60,7 @@ export function Dashboard() {
             <IconMapper name="circle-arrow-down.svg" className="text-red-500" />
           </div>
           <span className="text-3xl font-bold text-gray-800">
-            R$ {expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            {formatCurrency(expense, hideSensitiveData)}
           </span>
         </div>
       </div>
@@ -75,7 +84,9 @@ export function Dashboard() {
                 </div>
                 <div className="text-right">
                   <span className={`font-bold ${t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {t.type === 'INCOME' ? '+' : '-'} R$ {t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    {hideSensitiveData
+                      ? 'R$ •••••'
+                      : `${t.type === 'INCOME' ? '+' : '-'} R$ ${t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   </span>
                   <div className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full inline-block mt-1">
                     {t.category?.name}
@@ -94,7 +105,7 @@ export function Dashboard() {
               <div key={c.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
-                    <IconMapper name="tag.svg" size={16} />
+                    <IconMapper name="receipt-text.svg" size={16} />
                   </div>
                   <span className="font-medium text-gray-700">{c.name}</span>
                 </div>

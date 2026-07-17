@@ -11,6 +11,7 @@ export default function App() {
   const { signed, user, logout } = useAuth();
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'transactions' | 'categories'>('dashboard');
   const [showRegister, setShowRegister] = useState(false);
+  const [hideSensitiveData, setHideSensitiveData] = useState(false);
 
   if (!signed) {
     return showRegister ? (
@@ -32,20 +33,23 @@ export default function App() {
           <nav className="flex gap-6 font-medium text-gray-500">
             <button 
               onClick={() => setCurrentTab('dashboard')}
-              className={`hover:text-emerald-600 transition-colors ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'dashboard' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
+              <IconMapper name="house.svg" size={15} />
               Dashboard
             </button>
             <button 
               onClick={() => setCurrentTab('transactions')}
-              className={`hover:text-emerald-600 transition-colors ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'transactions' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
+              <IconMapper name="receipt-text.svg" size={15} />
               Transações
             </button>
             <button 
               onClick={() => setCurrentTab('categories')}
-              className={`hover:text-emerald-600 transition-colors ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
+              className={`hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5 ${currentTab === 'categories' ? 'text-emerald-600 border-b-2 border-emerald-500' : ''}`}
             >
+              <IconMapper name="tag.svg" size={15} />
               Categorias
             </button>
           </nav>
@@ -53,8 +57,15 @@ export default function App() {
         
         {/* Avatar do Usuário */}
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setHideSensitiveData((prev) => !prev)}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            title={hideSensitiveData ? 'Mostrar dados' : 'Ocultar dados'}
+          >
+            <IconMapper name={hideSensitiveData ? 'eye.svg' : 'eye-closed.svg'} size={18} />
+          </button>
           <div className="w-10 h-10 bg-gray-200 text-gray-700 font-bold rounded-full flex items-center justify-center border border-gray-300 uppercase cursor-pointer" title={user?.email}>
-            {user?.name.substring(0, 2)}
+            {hideSensitiveData ? '••' : user?.name.substring(0, 2)}
           </div>
           <button onClick={logout} className="text-gray-400 hover:text-red-500 transition-colors">
             <IconMapper name="log-out.svg" size={18} />
@@ -64,8 +75,8 @@ export default function App() {
 
       {/* Conteúdo Dinâmico Baseado nas Abas */}
       <main className="flex-1 p-8 max-w-7xl w-full mx-auto">
-        {currentTab === 'dashboard' && <Dashboard />}
-        {currentTab === 'transactions' && <Transactions />}
+        {currentTab === 'dashboard' && <Dashboard hideSensitiveData={hideSensitiveData} />}
+        {currentTab === 'transactions' && <Transactions hideSensitiveData={hideSensitiveData} />}
         {currentTab === 'categories' && <Categories />}
       </main>
     </div>
