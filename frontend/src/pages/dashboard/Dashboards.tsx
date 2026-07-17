@@ -72,7 +72,7 @@ export function Dashboard({ hideSensitiveData = false }: DashboardProps) {
           <h3 className="text-gray-400 font-bold text-xs tracking-wider uppercase mb-4">Transações Recentes</h3>
           <div className="divide-y divide-gray-50">
             {transactions.slice(0, 5).map((t: any) => (
-              <div key={t.id} className="py-4 flex justify-between items-center">
+              <div key={t.id} className="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-xl ${t.type === 'INCOME' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                     <IconMapper name={t.type === 'INCOME' ? 'circle-arrow-up.svg' : 'circle-arrow-down.svg'} />
