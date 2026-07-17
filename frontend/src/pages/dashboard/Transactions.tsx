@@ -137,14 +137,14 @@ export function Transactions({ hideSensitiveData = false }: TransactionsProps) {
   return (
     <div className="space-y-6">
       {/* Cabeçalho da Página */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
           <h1 className="text-2xl font-bold text-neutral-darkest">Transações</h1>
           <p className="text-sm text-neutral-medium">Gerencie todas as suas transações financeiras</p>
         </div>
         <button 
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
+          className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm w-full sm:w-auto"
         >
           <IconMapper name="plus.svg" size={18} />
           <span>Nova transação</span>
@@ -152,7 +152,7 @@ export function Transactions({ hideSensitiveData = false }: TransactionsProps) {
       </div>
 
       {/* Barra de Filtros (Inputs baseados no Style Guide) */}
-      <div className="bg-white p-5 rounded-2xl border border-neutral-light shadow-sm grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-light shadow-sm grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-bold text-neutral-dark uppercase tracking-wider">Buscar</label>
           <div className="relative">

@@ -68,14 +68,14 @@ export function Categories() {
   return (
     <div className="space-y-6">
       {/* Header da Seção */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
           <h1 className="text-2xl font-bold text-neutral-darkest">Categorias</h1>
           <p className="text-sm text-neutral-medium">Organize suas transações por categorias</p>
         </div>
         <button 
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
+          className="bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm w-full sm:w-auto"
         >
           <IconMapper name="plus.svg" size={18} />
           <span>Nova categoria</span>
