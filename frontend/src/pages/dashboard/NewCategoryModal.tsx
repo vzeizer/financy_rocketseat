@@ -29,8 +29,25 @@ interface NewCategoryModalProps {
 
 export function NewCategoryModal({ onClose, onRefresh, initialData = null }: NewCategoryModalProps) {
   const isEditMode = Boolean(initialData);
-  const iconOptions = ['utensils', 'car-front', 'shopping-cart', 'heart-pulse', 'briefcase-business', 'dumbbell'];
-  const colorOptions = ['#2563EB', '#7C3AED', '#DB2777', '#EA580C', '#CA8A04', '#168054'];
+  const iconOptions = [
+    'baggage-claim',
+    'car-front',
+    'heart-pulse',
+    'ticket',
+    'shopping-cart',
+    'square-pen',
+    'gift',
+    'utensils',
+    'paw-print',
+    'house',
+    'piggy-bank',
+    'tool-case',
+    'book-open',
+    'dumbbell',
+    'wallet',
+    'receipt-text',
+  ];
+  const colorOptions = ['#16A34A', '#2563EB', '#7C3AED', '#DB2777', '#DC2626', '#EA580C', '#CA8A04'];
   const [selectedIcon, setSelectedIcon] = useState((initialData?.icon || 'tag.svg').replace('.svg', ''));
   const [selectedColor, setSelectedColor] = useState(initialData?.color || colorOptions[0]);
 
@@ -85,7 +102,7 @@ export function NewCategoryModal({ onClose, onRefresh, initialData = null }: New
           {/* Grid Seletor de Ícones usando IconMapper */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-neutral-dark uppercase tracking-wider">Ícone representativo</label>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-8 gap-2">
               {iconOptions.map((icon) => (
                 <button 
                   key={icon} 
@@ -107,7 +124,7 @@ export function NewCategoryModal({ onClose, onRefresh, initialData = null }: New
           {/* Seletor de Cores do Style Guide */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-neutral-dark uppercase tracking-wider">Cor de Destaque</label>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {colorOptions.map((color) => (
                 <button 
                   key={color} 
@@ -115,10 +132,10 @@ export function NewCategoryModal({ onClose, onRefresh, initialData = null }: New
                   onClick={() => setSelectedColor(color)}
                   style={{ backgroundColor: color }}
                   aria-label={`Selecionar cor ${color}`}
-                  className={`w-7 h-7 rounded-full transition-transform cursor-pointer hover:scale-110 ${
+                  className={`w-10 h-5 rounded-md transition-transform cursor-pointer hover:scale-[1.03] ${
                     selectedColor === color
                       ? 'ring-2 ring-offset-2 ring-brand-primary border border-white'
-                      : 'border border-black/10'
+                      : 'border border-black/20'
                   }`}
                 />
               ))}

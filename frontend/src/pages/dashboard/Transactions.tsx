@@ -6,9 +6,41 @@ import { ConfirmDeleteModal } from '../../components/ConfirmDeleteModal';
 
 const PERIOD_ALL = 'ALL';
 
-const parseValidDate = (value: unknown): Date | null => {
+const monthLabels = [
+  'Janeiro',
+  'Fevereiro',
+  'Marco',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
+
+const getDateKey = (value: unknown): string | null => {
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.slice(0, 10);
+  }
+
   const date = new Date(value as string | number | Date);
-  return Number.isNaN(date.getTime()) ? null : date;
+  if (Number.isNaN(date.getTime())) return null;
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateCell = (value: unknown): string => {
+  const key = getDateKey(value);
+  if (!key) return '--';
+
+  const [year, month, day] = key.split('-');
+  return `${day}/${month}/${year.slice(2)}`;
 };
 
 const DELETE_TRANSACTION = gql`
@@ -76,17 +108,16 @@ export function Transactions() {
   const periodOptions: string[] = Array.from(
     new Set(
       transactions.map((transaction) => {
-        const date = parseValidDate(transaction.date);
-        if (!date) return null;
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const key = getDateKey(transaction.date);
+        if (!key) return null;
+        return key.slice(0, 7);
       }).filter(Boolean) as string[]
     )
   ).sort((a, b) => b.localeCompare(a));
 
   const formatPeriodLabel = (period: string) => {
     const [year, month] = period.split('-').map(Number);
-    const date = new Date(year, month - 1, 1);
-    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    return `${monthLabels[month - 1]} / ${year}`;
   };
 
   // Lógica de filtragem em memória para DX fluída
@@ -94,10 +125,7 @@ export function Transactions() {
     const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'ALL' || t.type === typeFilter;
     const matchesCategory = categoryFilter === 'ALL' || t.category?.id === categoryFilter;
-    const transactionDate = parseValidDate(t.date);
-    const transactionPeriod = transactionDate
-      ? `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`
-      : null;
+    const transactionPeriod = getDateKey(t.date)?.slice(0, 7) ?? null;
     const matchesPeriod = periodFilter === PERIOD_ALL || transactionPeriod === periodFilter;
     return matchesSearch && matchesType && matchesCategory && matchesPeriod;
   });
@@ -200,7 +228,7 @@ export function Transactions() {
                 <tr key={t.id} className="hover:bg-neutral-bg/30 transition-colors">
                   <td className="py-4 px-6 font-medium">{t.title}</td>
                   <td className="py-4 px-6 text-neutral-dark">
-                    {parseValidDate(t.date)?.toLocaleDateString('pt-BR') || '--'}
+                    {formatDateCell(t.date)}
                   </td>
                   <td className="py-4 px-6">
                     <span
