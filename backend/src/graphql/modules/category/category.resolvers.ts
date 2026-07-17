@@ -8,13 +8,13 @@ export const categoryResolvers = {
     },
   },
   Mutation: {
-    createCategory: (_: any, { name }: any, ctx: any) => {
+    createCategory: (_: any, { name, icon, color }: any, ctx: any) => {
       requireAuth(ctx.userId);
-      return CategoryService.create(name, ctx.userId);
+      return CategoryService.create({ name, icon, color }, ctx.userId);
     },
-    updateCategory: (_: any, { id, name }: any, ctx: any) => {
+    updateCategory: (_: any, { id, name, icon, color }: any, ctx: any) => {
       requireAuth(ctx.userId);
-      return CategoryService.update(id, name, ctx.userId);
+      return CategoryService.update(id, { name, icon, color }, ctx.userId);
     },
     deleteCategory: (_: any, { id }: any, ctx: any) => {
       requireAuth(ctx.userId);

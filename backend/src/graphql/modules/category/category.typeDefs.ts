@@ -1,10 +1,10 @@
 import { gql } from 'apollo-server';
 export const categoryTypeDefs = gql`
-  type Category { id: ID!, name: String!, userId: String! }
+  type Category { id: ID!, name: String!, icon: String!, color: String!, userId: String! }
   extend type Query { categories: [Category!]! }
   extend type Mutation {
-    createCategory(name: String!): Category!
-    updateCategory(id: ID!, name: String!): Category!
+    createCategory(name: String!, icon: String, color: String): Category!
+    updateCategory(id: ID!, name: String!, icon: String, color: String): Category!
     deleteCategory(id: ID!): Boolean!
   }
 `;

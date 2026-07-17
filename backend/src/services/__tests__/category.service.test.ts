@@ -46,14 +46,23 @@ describe('CategoryService', () => {
 
   describe('create', () => {
     it('deve criar uma nova categoria com sucesso', async () => {
-      const mockCategory = { id: '1', name: 'Alimentação', userId: 'user1' };
+      const mockCategory = { id: '1', name: 'Alimentação', icon: 'utensils.svg', color: '#EA580C', userId: 'user1' };
 
       (prisma.category.create as jest.Mock).mockResolvedValue(mockCategory);
 
-      const result = await CategoryService.create('Alimentação', 'user1');
+      const result = await CategoryService.create({
+        name: 'Alimentação',
+        icon: 'utensils.svg',
+        color: '#EA580C',
+      }, 'user1');
 
       expect(prisma.category.create).toHaveBeenCalledWith({
-        data: { name: 'Alimentação', userId: 'user1' },
+        data: {
+          name: 'Alimentação',
+          icon: 'utensils.svg',
+          color: '#EA580C',
+          userId: 'user1',
+        },
       });
       expect(result).toEqual(mockCategory);
     });
@@ -61,20 +70,28 @@ describe('CategoryService', () => {
 
   describe('update', () => {
     it('deve atualizar uma categoria com sucesso', async () => {
-      const mockCategory = { id: '1', name: 'Alimentação', userId: 'user1' };
-      const updatedCategory = { id: '1', name: 'Alimentação Atualizada', userId: 'user1' };
+      const mockCategory = { id: '1', name: 'Alimentação', icon: 'utensils.svg', color: '#EA580C', userId: 'user1' };
+      const updatedCategory = { id: '1', name: 'Alimentação Atualizada', icon: 'shopping-cart.svg', color: '#2563EB', userId: 'user1' };
 
       (prisma.category.findFirst as jest.Mock).mockResolvedValue(mockCategory);
       (prisma.category.update as jest.Mock).mockResolvedValue(updatedCategory);
 
-      const result = await CategoryService.update('1', 'Alimentação Atualizada', 'user1');
+      const result = await CategoryService.update('1', {
+        name: 'Alimentação Atualizada',
+        icon: 'shopping-cart.svg',
+        color: '#2563EB',
+      }, 'user1');
 
       expect(prisma.category.findFirst).toHaveBeenCalledWith({
         where: { id: '1', userId: 'user1' },
       });
       expect(prisma.category.update).toHaveBeenCalledWith({
         where: { id: '1' },
-        data: { name: 'Alimentação Atualizada' },
+        data: {
+          name: 'Alimentação Atualizada',
+          icon: 'shopping-cart.svg',
+          color: '#2563EB',
+        },
       });
       expect(result).toEqual(updatedCategory);
     });
@@ -82,7 +99,7 @@ describe('CategoryService', () => {
     it('deve lançar erro se categoria não for encontrada', async () => {
       (prisma.category.findFirst as jest.Mock).mockResolvedValue(null);
 
-      await expect(CategoryService.update('1', 'Novo Nome', 'user1')).rejects.toThrow(
+      await expect(CategoryService.update('1', { name: 'Novo Nome' }, 'user1')).rejects.toThrow(
         'Registro não encontrado ou não autorizado.'
       );
     });
@@ -90,7 +107,7 @@ describe('CategoryService', () => {
     it('deve lançar erro se categoria pertencer a outro usuário', async () => {
       (prisma.category.findFirst as jest.Mock).mockResolvedValue(null);
 
-      await expect(CategoryService.update('1', 'Novo Nome', 'user2')).rejects.toThrow(
+      await expect(CategoryService.update('1', { name: 'Novo Nome' }, 'user2')).rejects.toThrow(
         'Registro não encontrado ou não autorizado.'
       );
     });
