@@ -124,16 +124,16 @@ export function Categories() {
               {/* Botões de Ação Flutuantes */}
               <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                  onClick={() => handleEdit(c)}
-                  className="p-1 text-neutral-medium hover:text-brand-primary rounded-md"
-                >
-                  <IconMapper name="square-pen.svg" size={14} />
-                </button>
-                <button
                   onClick={() => setDeletingCategory({ id: c.id, name: c.name })}
                   className="p-1 text-neutral-medium hover:text-feedback-error rounded-md"
                 >
                   <IconMapper name="trash.svg" size={14} />
+                </button>
+                <button
+                  onClick={() => handleEdit(c)}
+                  className="p-1 text-neutral-medium hover:text-brand-primary rounded-md"
+                >
+                  <IconMapper name="square-pen.svg" size={14} />
                 </button>
               </div>
 

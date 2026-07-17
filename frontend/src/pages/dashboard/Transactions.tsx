@@ -73,7 +73,11 @@ const GET_TRANSACTIONS_PAGE = gql`
   }
 `;
 
-export function Transactions() {
+interface TransactionsProps {
+  hideSensitiveData?: boolean;
+}
+
+export function Transactions({ hideSensitiveData = false }: TransactionsProps) {
   const { data, loading, refetch } = useQuery(GET_TRANSACTIONS_PAGE);
   const [deleteTransactionMutation] = useMutation(DELETE_TRANSACTION);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -256,23 +260,25 @@ export function Transactions() {
                     )}
                   </td>
                   <td className={`py-4 px-6 text-right font-bold ${t.type === 'INCOME' ? 'text-feedback-success' : 'text-feedback-error'}`}>
-                    {t.type === 'INCOME' ? '+' : '-'} R$ {t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    {hideSensitiveData
+                      ? 'R$ •••••'
+                      : `${t.type === 'INCOME' ? '+' : '-'} R$ ${t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => setEditingTransaction(t)}
-                        className="p-1.5 text-neutral-medium hover:text-brand-primary border border-transparent hover:border-neutral-light rounded-lg transition-all"
-                        title="Editar"
-                      >
-                        <IconMapper name="square-pen.svg" size={16} />
-                      </button>
                       <button
                         onClick={() => setDeletingTransaction({ id: t.id, title: t.title })}
                         className="p-1.5 text-neutral-medium hover:text-feedback-error border border-transparent hover:border-neutral-light rounded-lg transition-all" 
                         title="Excluir"
                       >
                         <IconMapper name="trash.svg" size={16} />
+                      </button>
+                      <button
+                        onClick={() => setEditingTransaction(t)}
+                        className="p-1.5 text-neutral-medium hover:text-brand-primary border border-transparent hover:border-neutral-light rounded-lg transition-all"
+                        title="Editar"
+                      >
+                        <IconMapper name="square-pen.svg" size={16} />
                       </button>
                     </div>
                   </td>
